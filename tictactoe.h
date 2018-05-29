@@ -1,24 +1,41 @@
-enum marker {M_B, M_X, M_O};
+#ifndef __TICTACTOE_H__
+#define __TICTACTOE_H__
 
+
+// The different states a square on the board can be in.
+enum state {BLANK, CROSS, NAUGHT};
+
+
+// Struct for holding the coordinates of a player's move.
+struct move
+{
+    int row;
+    int col;
+};
+
+
+// Class to provide methods for making game modes of tic-tac-toe.
 class tictactoe
 {
-    public:
-        tictactoe();
+public:
+    tictactoe();
 
-        int get_player();
-        void set_player(int x);
-        bool winner();
-        void print_board();
-        void get_move(int& row, int& column);
-        void random_ai_move(int& row, int& column);
-        void update_board(int row, int column);
+    int GetPlayer() const;
+    bool Winner() const;
+    void SetPlayer(const int x);
+    void PrintBoard() const;
+    void UpdateBoard(const move& nextMove);
+    move PlayerMove() const;
+    move RandomAIMove() const;
 
-    private:
-        marker board[3][3];
-        int player;
+private:
+    int player;             // Current player (typically 1 or 2)
+    state board[3][3];      // Holds state of every board square
 
-        bool valid(int row, int column);
-        bool row_check();
-        bool col_check();
-        bool diag_check();
+    bool RowCheck() const;
+    bool ColCheck() const;
+    bool DiagCheck() const;
+    bool ValidMove(const move& nextMove) const;
 };
+
+#endif

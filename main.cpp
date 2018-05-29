@@ -1,38 +1,43 @@
-#include <iostream>
-
 #include "gamemodes.h"
 
-using namespace std;
+#include <iostream>
+
+using std::cout;
+using std::cin;
+
 
 int main()
 {
-    cout << "Welcome to tic-tac-toe!  You play by entering the row and column number of the square you want to mark." << endl;
+    cout << "Welcome to tic-tac-toe!  You play by entering the row\n";
+    cout << "and column number of the square you want to mark.\n";
 
     bool quit = false;
-
-    while(!quit)
+    while (!quit)
     {
         int choice;
-
-        cout << endl << "Main menu.  Select your game mode:" << endl;
-        cout << "1) One Player." << endl;
-        cout << "2) Two player." << endl;
-        cout << "3) Exit." << endl;
+        cout << "\nMain menu.  Select your game mode:\n";
+        cout << "1) One Player.\n";
+        cout << "2) Two player.\n";
+        cout << "3) Exit.\n";
         cout << "Choice: ";
         cin >> choice;
 
-        if(choice > 3 || choice < 1){cout << "Invalid choice." << endl;}
+        if ((choice > 3) || (choice < 1))
+            cout << "Invalid choice.\n";
         else
         {
-            switch(choice)
+            switch (choice)
             {
-                case 1: one_player_game();
-                        break;
-                case 2: two_player_game();
-                        break;
-                case 3: cout << endl << "Thanks for playing!!!" << endl;
-                        quit = true;
-                        break;
+            case 1:
+                OnePlayerGame();
+                break;
+            case 2:
+                TwoPlayerGame();
+                break;
+            case 3:
+                cout << "\nThanks for playing!!!\n";
+                quit = true;
+                break;
             }
         }
     }

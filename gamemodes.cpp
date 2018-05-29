@@ -1,119 +1,134 @@
-#include <iostream>
-
 #include "tictactoe.h"
 
-using namespace std;
+#include <iostream>
 
-bool play_again()
+using std::cout;
+using std::cin;
+
+
+// Functions providing game modes using the tictactoe class methods.
+
+// Loops until player enters a valid choice of whether they want to play again.
+bool PlayAgain()
 {
+    cout << "\nWould you like to play again? (Y/N)\n";
+
     char choice;
-
-    cout << endl << "Would you like to play again? (Y/N)" << endl;
-
-    while(1)
+    while (true)
     {
         cin >> choice;
 
-        if(choice == 'N' || choice == 'n'){return false;}
-        else if(choice == 'Y' || choice == 'y'){return true;}
-        else{cout << "Invalid choice, please select from Y/N: ";}
+        if ((choice == 'N') || (choice == 'n'))
+            return false;
+        else if ((choice == 'Y') || (choice == 'y'))
+            return true;
+        else
+            cout << "Invalid choice, please select from Y/N: ";
     }
 }
 
-void one_player_game()
-{
-    int player_turn;
 
-    while(1)
+// One player game of human against an (incredibly dumb) AI.
+void OnePlayerGame()
+{
+    // Loop until player doesn't want to play anymore
+    while (true)
     {
+        // Game setup
         cout << "Would you like to play first or second?  ";
 
-        while(1)
+        int playerTurn;
+        while (true)    // Get valid turn order for human player
         {
             cout << "Enter 1 for first or 2 for second: ";
-            cin >> player_turn;
+            cin >> playerTurn;
 
-            if(player_turn == 1 || player_turn == 2){break;}
-            else{cout << "Invalid choice.  ";}
+            if ((playerTurn == 1) || (playerTurn == 2))
+                break;
+            else
+                cout << "Invalid choice.  ";
         }
+        cout << "\n";
 
-        cout << endl;
 
         tictactoe game;
 
-        if(player_turn == 1){game.print_board();}
+        if (playerTurn == 1)    // AI doesn't need to see the
+            game.PrintBoard();  // board to make its first move
 
-        for(int i = 0; i < 9; i++)
+        // Main game loop (max 9 moves)
+        for (int i = 0; i < 9; ++i)
         {
-            int row, column;
+            game.SetPlayer((i % 2) + 1);
 
-            game.set_player(i%2 + 1);
-
-            if(game.get_player() == player_turn)
-            {
-                cout << "Your turn." << endl;
-
-                game.get_move(row, column);
+            // Get next move from human/AI
+            move nextMove;
+            if (game.GetPlayer() == playerTurn) {
+                cout << "Your turn.\n";
+                nextMove = game.PlayerMove();
             }
-            else
-            {
-                cout << "AI's turn." << endl;
-
-                game.random_ai_move(row, column);
+            else {
+                cout << "AI's turn.\n";
+                nextMove = game.RandomAIMove();
             }
 
-            game.update_board(row, column);
+            game.UpdateBoard(nextMove);
 
-            game.print_board();
+            game.PrintBoard();
 
-            if(game.winner())
+            if (game.Winner())
             {
-                if(game.get_player() == player_turn){cout << "You win!!!";}
-                else{cout << "The AI wins...";}
-
+                if (game.GetPlayer() == playerTurn)
+                    cout << "You win!!!";
+                else
+                    cout << "The AI wins...";
                 break;
             }
 
-            if(i == 8){cout << "No more moves remaining.  It's a draw!!!";}
+            if (i == 8)
+                cout << "No more moves remaining.  It's a draw!!!";
         }
 
-        if(!play_again()){break;}
+        if (!PlayAgain())
+            break;
     }
 }
 
-void two_player_game()
-{
-    while(1)
-    {
-        cout << endl;
 
+// Standard two-player game of Tic-Tac-Toe.
+void TwoPlayerGame()
+{
+    // Loop until players don't want to play anymore
+    while (true)
+    {
         tictactoe game;
 
-        game.print_board();
+        cout << "\n";
+        game.PrintBoard();
 
-        for(int i = 0; i < 9; i++)
+        // Main game loop (max 9 turns)
+        for (int i = 0; i < 9; ++i)
         {
-            int row, column;
+            game.SetPlayer((i % 2) + 1);
 
-            game.set_player(i%2 + 1);
+            printf("Player %d's turn.\n", game.GetPlayer());
 
-            cout << "Player " << game.get_player() << "'s turn." << endl;
+            move nextMove = game.PlayerMove();
 
-            game.get_move(row, column);
+            game.UpdateBoard(nextMove);
 
-            game.update_board(row, column);
+            game.PrintBoard();
 
-            game.print_board();
-
-            if(game.winner())
-            {
-                cout << "Player " << game.get_player() << " wins!!!";
+            if (game.Winner()) {
+                printf("Player %d wins!!!", game.GetPlayer());
                 break;
             }
 
-            if(i == 8){cout << "No more moves remaining.  It's a draw!!!";}
+            if (i == 8)
+                cout << "No more moves remaining.  It's a draw!!!";
         }
 
-        if(!play_again()){break;}
+        if (!PlayAgain())
+            break;
     }
 }

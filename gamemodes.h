@@ -1,3 +1,8 @@
-bool play_again();
-void one_player_game();
-void two_player_game();
+#ifndef __GAMEMODES_H__
+#define __GAMEMODES_H__
+
+bool PlayAgain();
+void OnePlayerGame();
+void TwoPlayerGame();
+
+#endif
