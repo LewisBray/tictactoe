@@ -8,3 +8,6 @@ The data and methods needed for writing a game loop are put into
 a class called tictactoe and two simple game modes of a standard
 two player game and a single player game against an AI picking
 squares at random were included.
+
+I'm fairly sure this could be easily modified to have variable
+sized boards, some work has already gone into this.
