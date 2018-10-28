@@ -1,41 +1,44 @@
 #ifndef __TICTACTOE_H__
 #define __TICTACTOE_H__
 
-
-// The different states a square on the board can be in.
-enum state {BLANK, CROSS, NAUGHT};
-
-
 // Struct for holding the coordinates of a player's move.
-struct move
+struct Move
 {
-    int row;
-    int col;
+    Move() {}
+    Move(const int row, const int col) : row_{ row }, col_{ col } {}
+
+    int row_;
+    int col_;
 };
 
-
 // Class to provide methods for making game modes of tic-tac-toe.
-class tictactoe
+class TicTacToe
 {
 public:
-    tictactoe();
+    enum { BoardSize = 3 };
 
-    int GetPlayer() const;
-    bool Winner() const;
-    void SetPlayer(const int x);
-    void PrintBoard() const;
-    void UpdateBoard(const move& nextMove);
-    move PlayerMove() const;
-    move RandomAIMove() const;
+    TicTacToe();
+
+    int getPlayer() const;
+    bool playerHasWon() const;
+    void displayBoard() const;
+    void setPlayer(const int nextPlayer);
+    void updateBoard(const Move& nextMove);
+    Move generateRandomAIMove() const;
+    Move askHumanPlayerForMove() const;
 
 private:
-    int player;             // Current player (typically 1 or 2)
-    state board[3][3];      // Holds state of every board square
+    enum class SquareState { Blank, Cross, Naught };
 
-    bool RowCheck() const;
-    bool ColCheck() const;
-    bool DiagCheck() const;
-    bool ValidMove(const move& nextMove) const;
+    int player_;
+    SquareState board_[BoardSize][BoardSize];
+
+    char squareStateToChar(const int row, const int col) const;
+    bool playerHasWonByRow() const;
+    bool playerHasWonByColumn() const;
+    bool playerHasWonByDiagonal() const;
+    bool moveIsValid(const Move& move) const;
+    void drawRowOfSquares(const int row) const;
 };
 
 #endif

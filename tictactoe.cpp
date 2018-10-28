@@ -1,287 +1,229 @@
 #include "tictactoe.h"
 
 #include <iostream>
+#include <iomanip>
 #include <vector>
-#include <ctime>
-
-using std::cout;
-using std::cin;
+#include <random>
 
 
-// Default constructor.
-/*
-player could be anything (user may want to develop Tic-Tac-Toe modes with
-any number of players so we just set to 0.  It's important (at least for
-the standard game modes) that the board be filled with blank squares.
-*/
-tictactoe::tictactoe()
-    : player(0)
+TicTacToe::TicTacToe()
+    : player_{ 0 }
 {
-    for (int i = 0; i < 3; ++i)
-        for (int j = 0; j < 3; ++j)
-            board[i][j] = BLANK;
+    // It's important (at least for the standard game modes) that the board be
+    // filled with blank states as this fact is used when checking for a winner.
+    for (int row = 0; row < BoardSize; ++row)
+        for (int col = 0; col < BoardSize; ++col)
+            board_[row][col] = SquareState::Blank;
 }
 
-
-// Returns the current player.
-int tictactoe::GetPlayer() const
+int TicTacToe::getPlayer() const
 {
-    return player;
+    return player_;
 }
 
-
-// Sets the current player.
-void tictactoe::SetPlayer(const int x)
+void TicTacToe::setPlayer(const int nextPlayer)
 {
-    player = x;
+    player_ = nextPlayer;
 }
 
-
-// Checks if there is a winner in the current game.
-/*
-This calls helper functions that check whether we have a completed row,
-column or diagonal.  The multiple if statements is so that if we get a
-true value from any helper function then there is no need to check the
-others.
-
-\return     true if there is a winner or false if not.
-*/
-bool tictactoe::Winner() const
+bool TicTacToe::playerHasWon() const
 {
-    if (RowCheck())
-        return true;
-    else if (ColCheck())
-        return true;
-    else if (DiagCheck())
-        return true;
-    else
-        return false;
+    return playerHasWonByRow()
+        || playerHasWonByColumn()
+        || playerHasWonByDiagonal();
 }
 
-
-// Displays the board in its current state.
-/*
-The format may look strange but when this was made it was originally
-intended to be scalable for larger game boards (e.g. we could create a
-constant called boardSize and this could dictate the width and height
-by using it as the limiting value in each of the for loops).
-*/
-void tictactoe::PrintBoard() const
+// The format may look strange for this drawing process but when this was made
+// it was originally intended to be scalable for larger game boards.
+void TicTacToe::displayBoard() const
 {
-    cout << "\t";
-    for (int i = 0; i < 3; ++i)
-        printf("   %d   ", i);
+    std::cout << '\t';
+    for (int row = 0; row < BoardSize; ++row)
+        std::cout << std::setw(4) << row << std::setw(3) << ' ';
 
-    cout << "\n";
-    for (int i = 0; i < 3; ++i)
-    {
-        cout << "\t";
-        for (int j = 0; j < 3; ++j)
-            cout << " ----- ";
+    std::cout << std::endl;
+    for (int row = 0; row < BoardSize; ++row)
+        drawRowOfSquares(row);
+}
 
-        cout << "\n\t";
-        for (int j = 0; j < 3; ++j)
-            cout << "|     |";
+void TicTacToe::drawRowOfSquares(const int row) const
+{
+    std::cout << '\t' << std::setfill('-');
+    for (int col = 0; col < BoardSize; ++col)
+        std::cout << ' ' << std::setw(6) << ' ';
 
-        printf("\n      %d ", i);
-        for (int j = 0; j < 3; ++j)
-        {
-            char square;
-            if (board[i][j] == CROSS)
-                square = 'X';
-            else if (board[i][j] == NAUGHT)
-                square = 'O';
-            else
-                square = ' ';
-            printf("|  %c  |", square);
-        }
+    std::cout << std::setfill(' ') << std::endl << '\t';
+    for (int col = 0; col < BoardSize; ++col)
+        std::cout << '|' << std::setw(6) << '|';
 
-        cout << "\n\t";
-        for (int j = 0; j < 3; ++j)
-            cout << "|     |";
-
-        cout << "\n\t";
-        for (int j = 0; j < 3; ++j)
-            cout << " ----- ";
-
-        cout << "\n\n";
+    std::cout << std::endl << std::setw(7) << row << ' ';
+    for (int col = 0; col < BoardSize; ++col) {
+        const char squareState = squareStateToChar(row, col);
+        std::cout << '|' << std::setw(3) << squareState << std::setw(3) << '|';
     }
+
+    std::cout << std::endl << '\t';
+    for (int col = 0; col < BoardSize; ++col)
+        std::cout << '|' << std::setw(6) << '|';
+
+    std::cout << std::endl << '\t' << std::setfill('-');
+    for (int col = 0; col < BoardSize; ++col)
+        std::cout << ' ' << std::setw(6) << ' ';
+
+    std::cout << std::setfill(' ') << std::endl;
 }
 
-
-// Asks a human player to input a move.
-/*
-\return     Valid human player move.
-*/
-move tictactoe::PlayerMove() const
+char TicTacToe::squareStateToChar(const int row, const int col) const
 {
-    move nextMove;
+    if (board_[row][col] == SquareState::Cross)
+        return 'X';
+    else if (board_[row][col] == SquareState::Naught)
+        return 'O';
+    else
+        return ' ';
+}
+
+Move TicTacToe::askHumanPlayerForMove() const
+{
     while (true)
     {
-        cout << "Row: ";
-        cin >> nextMove.row;
-        cout << "Column: ";
-        cin >> nextMove.col;
+        Move nextMove;
+        std::cout << "Row: ";
+        std::cin >> nextMove.row_;
+        std::cout << "Column: ";
+        std::cin >> nextMove.col_;
 
-        if (ValidMove(nextMove))
-            break;
+        if (moveIsValid(nextMove)) {
+            std::cout << std::endl;
+            return nextMove;
+        }
     }
-    cout << "\n";
-
-    return nextMove;
 }
 
-
-// Returns a random AI move from the remaining available squares.
-/*
-This is not a very sophisticated AI, it simply picks a random square
-from the available squares.  There is no consideration for optimal
-moves or trying to combat the player in any way, I'm sure this could
-be made much more interesting with some effort.
-
-\return     Valid random AI move.
-*/
-move tictactoe::RandomAIMove() const
+// This is not a very sophisticated AI, it simply picks a random square from the
+// available squares.  There is no consideration for optimal moves or trying to
+// combat the player in any way, I'm sure this could be made much more
+// interesting with some effort.
+Move TicTacToe::generateRandomAIMove() const
 {
-    srand((unsigned)time(nullptr));
+    std::vector<Move> possibleMoves;
+    for (int row = 0; row < BoardSize; ++row)
+        for (int col = 0; col < BoardSize; ++col)
+            if (board_[row][col] == SquareState::Blank)
+                possibleMoves.emplace_back(row, col);
 
-    // Create a vector of available moves
-    std::vector<move> possMoves;
-    for (int i = 0; i < 3; ++i)
-        for (int j = 0; j < 3; ++j)
-            if (board[i][j] == BLANK)
-                possMoves.push_back(move{ i, j });
+    const int lastPossMoveIndex = possibleMoves.size() - 1;
+    std::uniform_int_distribution uniformDist{ 0, lastPossMoveIndex };
 
-    // Grab a random one
-    int randIndex = rand() % possMoves.size();
+    std::minstd_rand rng;
+    const int randIndex = uniformDist(rng);
 
-    int row = possMoves[randIndex].row;
-    int col = possMoves[randIndex].col;
-    printf("The AI chose row %d and column %d.\n\n", row, col);
+    const int randomRow = possibleMoves[randIndex].row_;
+    const int randomCol = possibleMoves[randIndex].col_;
+    std::cout << "The AI chose row " << randomRow
+        << " and column " << randomCol << '.' << std::endl << std::endl;
 
-    return possMoves[randIndex];
+    return possibleMoves[randIndex];
 }
 
-
-// Updates the board corresponding to the move passed in.
-/*
-\param  nextMove    Valid move generated since last board update.
-*/
-void tictactoe::UpdateBoard(const move& nextMove)
+//nextMove here has to be valid as determined by TicTacToe::moveIsValid.
+void TicTacToe::updateBoard(const Move& nextMove)
 {
-    int row = nextMove.row;
-    int col = nextMove.col;
+    const int row = nextMove.row_;
+    const int col = nextMove.col_;
 
-    board[row][col] = (player == 1) ? CROSS : NAUGHT;
+    board_[row][col] = (player_ == 1) ?
+        SquareState::Cross : SquareState::Naught;
 }
 
-
-// Helper function that checks if a move is valid.
-/*
-\param  nextMove    Move to check validity of.
-
-\return     true if valid move and false otherwise.
-*/
-bool tictactoe::ValidMove(const move& nextMove) const
+bool TicTacToe::moveIsValid(const Move& move) const
 {
-    int row = nextMove.row;
-    int col = nextMove.col;
+    const int row = move.row_;
+    const int col = move.col_;
 
-    if ((row < 0) || (row > 2) || (col < 0) || (col > 2)) {
-        cout << "That is not an available game square!\n";
+    if (row < 0 || row > BoardSize - 1 || col < 0 || col > BoardSize - 1) {
+        std::cout << "That is not an available game square!" << std::endl;
         return false;
     }
 
-    if ((board[row][col] == CROSS) || (board[row][col] == NAUGHT)) {
-        cout << "That square has already been marked!\n";
+    if (board_[row][col] == SquareState::Cross
+        || board_[row][col] == SquareState::Naught) {
+        std::cout << "That square has already been marked!" << std::endl;
         return false;
     }
 
     return true;
 }
 
-
-// Checks if a player has filled in a row.
-/*
-\return     true if a row has been filled in and false if not.
-*/
-bool tictactoe::RowCheck() const
+bool TicTacToe::playerHasWonByRow() const
 {
-    // Go through each row
-    for (int i = 0; i < 3; ++i)
+    for (int row = 0; row < BoardSize; ++row)
     {
-        // This would need changing for variable board size
-        bool rowFilled = (board[i][0] == board[i][1])
-                          && (board[i][1] == board[i][2]);
+        const bool rowFilledWithSameState = std::invoke([row, this]() {
+            for (int col = 0; col < BoardSize - 1; ++col)
+                if (board_[row][col] != board_[row][col + 1])
+                    return false;
 
-        // If all elements of a row are the
-        // same, then make sure they're not blank
-        if (rowFilled && (board[i][0] == BLANK))
-            rowFilled = false;
-
-        // If passed both tests then we
-        // have a legitimate filled row
-        if (rowFilled)
             return true;
-    }
+        });
 
-    // If we got here then no filled rows
-    return false;
-}
-
-
-// Checks if a player has filled in a column.
-/*
-\return     true if a column has been filled in and false if not.
-*/
-bool tictactoe::ColCheck() const
-{
-    // Go through each column
-    for (int i = 0; i < 3; ++i)
-    {
-        // This would need changing for variable board size
-        bool colFilled = (board[0][i] == board[1][i])
-                          && (board[1][i] == board[2][i]);
-
-        // If all elements of a column are the
-        // same, then make sure they're not blank
-        if (colFilled && (board[0][i] == BLANK))
-            colFilled = false;
-
-        // If passed both tests then we
-        // have a legitimate filled column
-        if (colFilled)
-            return true;
+        if (rowFilledWithSameState) {
+            const bool rowIsNotBlank = (board_[row][0] != SquareState::Blank);
+            if (rowIsNotBlank)
+                return true;
+        }
     }
 
     return false;
 }
 
-
-// Checks if a player has filled in a diagonal.
-/*
-\return     true if a diagonal has been filled in and false if not.
-*/
-bool tictactoe::DiagCheck() const
+bool TicTacToe::playerHasWonByColumn() const
 {
-    // If the middle square is blank then neither
-    // diagonal can be filled with non-blank squares
-    if (board[1][1] == BLANK)
-        return false;
+    for (int col = 0; col < BoardSize; ++col)
+    {
+        const bool colFilledWithSameState = std::invoke([col, this]() {
+            for (int row = 0; row < BoardSize - 1; ++row)
+                if (board_[row][col] != board_[row + 1][col])
+                    return false;
 
-    // Check top-left to bottom-right diagonal
-    bool diagFilled = (board[0][0] == board[1][1])
-                       && (board[1][1] == board[2][2]);
+            return true;
+        });
 
-    // We don't have to check for blank
-    // squares thanks to first step
-    if (diagFilled)
+        if (colFilledWithSameState) {
+            const bool colIsNotBlank = (board_[0][col] != SquareState::Blank);
+            if (colIsNotBlank)
+                return true;
+        }
+    }
+
+    return false;
+}
+
+bool TicTacToe::playerHasWonByDiagonal() const
+{
+    if (board_[1][1] == SquareState::Blank) // If middle square blank neither...
+        return false;                       // ...diagonal can be non-blank
+
+    // Check top-left to bottom-right diagonal is filled with same state
+    const bool tlbrDiagFilledWithSameState = std::invoke([this]() {
+        for (int i = 0; i < BoardSize - 1; ++i)
+            if (board_[i][i] != board_[i + 1][i + 1])
+                return false;
+
         return true;
+    });
 
-    // If here then move on to checking
-    // bottom-left to top-right diagonal
-    diagFilled = (board[0][2] == board[1][1])
-                  && (board[1][1] == board[2][0]);
+    if (tlbrDiagFilledWithSameState)    // No need to check for blank...
+        return true;                    // ... squares thanks to first step
 
-    return diagFilled;
+    // If here, check bottom-left to top-right diagonal
+    const bool bltrDiagFilledWithSameState = std::invoke([this]() {
+        for (int i = 0; i < BoardSize - 1; ++i)
+            if (board_[BoardSize - 1 - i][i] != board_[BoardSize - 2 - i][i + 1])
+                return false;
+
+        return true;
+    });
+
+    return bltrDiagFilledWithSameState;
 }

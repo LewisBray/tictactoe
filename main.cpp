@@ -2,43 +2,45 @@
 
 #include <iostream>
 
-using std::cout;
-using std::cin;
 
+static void displayMenu()
+{
+    std::cout << "\nMain menu.  Select your game mode:" << std::endl
+        << "1) One Player." << std::endl
+        << "2) Two player." << std::endl
+        << "3) Exit." << std::endl
+        << "Choice: ";
+}
 
 int main()
 {
-    cout << "Welcome to tic-tac-toe!  You play by entering the row\n";
-    cout << "and column number of the square you want to mark.\n";
+    std::cout << "Welcome to tic-tac-toe!  You play by entering the row"
+        << std::endl << "and column number of the square you want to mark."
+        << std::endl;
 
     bool quit = false;
     while (!quit)
     {
-        int choice;
-        cout << "\nMain menu.  Select your game mode:\n";
-        cout << "1) One Player.\n";
-        cout << "2) Two player.\n";
-        cout << "3) Exit.\n";
-        cout << "Choice: ";
-        cin >> choice;
+        displayMenu();
 
-        if ((choice > 3) || (choice < 1))
-            cout << "Invalid choice.\n";
-        else
+        int userChoice;
+        std::cin >> userChoice;
+
+        switch (userChoice)
         {
-            switch (choice)
-            {
-            case 1:
-                OnePlayerGame();
-                break;
-            case 2:
-                TwoPlayerGame();
-                break;
-            case 3:
-                cout << "\nThanks for playing!!!\n";
-                quit = true;
-                break;
-            }
+        case 1:
+            onePlayerGame();
+            break;
+        case 2:
+            twoPlayerGame();
+            break;
+        case 3:
+            std::cout << std::endl << "Thanks for playing!!!" << std::endl;
+            quit = true;
+            break;
+        default:
+            std::cout << "Invalid choice, please choose again." << std::endl;
+            break;
         }
     }
 
