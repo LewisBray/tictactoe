@@ -41,7 +41,7 @@ void TicTacToe::displayBoard() const
     for (int row = 0; row < BoardSize; ++row)
         std::cout << std::setw(4) << row << std::setw(3) << ' ';
 
-    std::cout << std::endl;
+    std::cout << '\n';
     for (int row = 0; row < BoardSize; ++row)
         drawRowOfSquares(row);
 }
@@ -52,21 +52,21 @@ void TicTacToe::drawRowOfSquares(const int row) const
     for (int col = 0; col < BoardSize; ++col)
         std::cout << ' ' << std::setw(6) << ' ';
 
-    std::cout << std::setfill(' ') << std::endl << '\t';
+    std::cout << std::setfill(' ') << "\n\t";
     for (int col = 0; col < BoardSize; ++col)
         std::cout << '|' << std::setw(6) << '|';
 
-    std::cout << std::endl << std::setw(7) << row << ' ';
+    std::cout << '\n' << std::setw(7) << row << ' ';
     for (int col = 0; col < BoardSize; ++col) {
         const char squareState = squareStateToChar(row, col);
         std::cout << '|' << std::setw(3) << squareState << std::setw(3) << '|';
     }
 
-    std::cout << std::endl << '\t';
+    std::cout << "\n\t";
     for (int col = 0; col < BoardSize; ++col)
         std::cout << '|' << std::setw(6) << '|';
 
-    std::cout << std::endl << '\t' << std::setfill('-');
+    std::cout << "\n\t" << std::setfill('-');
     for (int col = 0; col < BoardSize; ++col)
         std::cout << ' ' << std::setw(6) << ' ';
 
@@ -121,7 +121,7 @@ Move TicTacToe::generateRandomAIMove() const
     const int randomRow = possibleMoves[randIndex].row_;
     const int randomCol = possibleMoves[randIndex].col_;
     std::cout << "The AI chose row " << randomRow
-        << " and column " << randomCol << '.' << std::endl << std::endl;
+        << " and column " << randomCol << ".\n" << std::endl;
 
     return possibleMoves[randIndex];
 }
