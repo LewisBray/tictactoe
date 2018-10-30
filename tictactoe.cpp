@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <vector>
 #include <random>
+#include <chrono>
 
 
 TicTacToe::TicTacToe()
@@ -112,11 +113,7 @@ Move TicTacToe::generateRandomAIMove() const
             if (board_[row][col] == SquareState::Blank)
                 possibleMoves.emplace_back(row, col);
 
-    const int lastPossMoveIndex = possibleMoves.size() - 1;
-    std::uniform_int_distribution uniformDist{ 0, lastPossMoveIndex };
-
-    std::minstd_rand rng;
-    const int randIndex = uniformDist(rng);
+    const int randIndex = generateRandomIndex(possibleMoves.size() - 1);
 
     const int randomRow = possibleMoves[randIndex].row_;
     const int randomCol = possibleMoves[randIndex].col_;
@@ -226,4 +223,18 @@ bool TicTacToe::playerHasWonByDiagonal() const
     });
 
     return bltrDiagFilledWithSameState;
+}
+
+// Generates a number in the range [low, high]
+int TicTacToe::generateRandomIndex(const int lastIndex)
+{
+    std::uniform_int_distribution uniformDist{ 0, lastIndex };
+
+    const auto currentTime = std::chrono::system_clock::now();
+    const unsigned rngSeed =
+        static_cast<unsigned>(currentTime.time_since_epoch().count());
+
+    std::minstd_rand rng{ rngSeed };
+
+    return uniformDist(rng);
 }

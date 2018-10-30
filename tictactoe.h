@@ -39,6 +39,8 @@ private:
     bool playerHasWonByDiagonal() const;
     bool moveIsValid(const Move& move) const;
     void drawRowOfSquares(const int row) const;
+
+    static int generateRandomIndex(const int lastIndex);
 };
 
 #endif
