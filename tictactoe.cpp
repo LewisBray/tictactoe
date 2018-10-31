@@ -225,7 +225,7 @@ bool TicTacToe::playerHasWonByDiagonal() const
     return bltrDiagFilledWithSameState;
 }
 
-// Generates a number in the range [low, high]
+// Generates a number in the range [0, lastIndex]
 int TicTacToe::generateRandomIndex(const int lastIndex)
 {
     std::uniform_int_distribution uniformDist{ 0, lastIndex };
